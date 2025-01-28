@@ -1,6 +1,7 @@
 package Hotelia.example.Hotelia.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.util.Date;
@@ -17,14 +18,24 @@ public class Book {
     private String paymentStatus;
     private String name;
     private String phone;
+    private Long hotelId;
     @ManyToOne
     @JoinColumn(name = "userId")
     @JsonIgnore
     private User user;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "roomId")
-    @JsonIgnore
+    //@JsonManagedReference
+    //@JsonIgnore
     private Room room;
+
+    public Long getHotelId() {
+        return hotelId;
+    }
+
+    public void setHotelId(Long hotelId) {
+        this.hotelId = hotelId;
+    }
 
     public String getName() {
         return name;

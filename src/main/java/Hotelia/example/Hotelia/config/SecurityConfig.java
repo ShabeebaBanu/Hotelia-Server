@@ -44,7 +44,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
                         req->req.requestMatchers("/api/v1/auth/**").permitAll()
-                                .requestMatchers("/api/v1/hotel/admin/**").hasAuthority("ADMIN")
+                                .requestMatchers("/api/v1/hotel/admin/**","/api/v1/room/admin/**","/api/v1/book/admin/**").hasAuthority("ADMIN")
                                 .requestMatchers("/api/v1/hotel/**", "/api/v1/room/**").permitAll()
                                 .anyRequest()
                                 .authenticated()
@@ -52,15 +52,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-//                .exceptionHandling(
-//                        e->e.accessDeniedHandler(
-//                                (request, response, accessDeniedException) -> response.setStatus(403)
-//                        )
-//                                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
-//                .logout(l->l
-//                .logoutUrl("/logout")
-//                .addLogoutHandler(customLogout)
-//                .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext()))
+
         .build();
     }
 

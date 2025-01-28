@@ -20,9 +20,9 @@ public class HotelController {
         this.hotelService = hotelService;
     }
 
-    @PostMapping("/admin")
-    public ResponseEntity<Hotel> addHotel(@RequestBody Hotel hotelRequest) throws HotelAlreadyExistException {
-        return ResponseEntity.ok(hotelService.addHotel(hotelRequest));
+    @PostMapping("/admin/{adminId}")
+    public ResponseEntity<Hotel> addHotel(@RequestBody Hotel hotelRequest,@PathVariable Long adminId) throws HotelAlreadyExistException {
+        return ResponseEntity.ok(hotelService.addHotel(hotelRequest, adminId));
     }
 
     @GetMapping("/{hotelId}")
@@ -58,5 +58,10 @@ public class HotelController {
     ){
         Hotel updated = hotelService.updateHotel(hotelId, updatedHotel);
         return ResponseEntity.ok(updated);
+    }
+
+    @GetMapping("/admin/{userId}")
+    public ResponseEntity<List<Hotel>> getHotelByUserId(@PathVariable Long userId){
+        return ResponseEntity.ok(hotelService.getHotelByAdminId(userId));
     }
 }

@@ -2,7 +2,9 @@ package Hotelia.example.Hotelia.service;
 
 import Hotelia.example.Hotelia.exception.HotelAlreadyExistException;
 import Hotelia.example.Hotelia.model.Hotel;
+import Hotelia.example.Hotelia.model.User;
 import Hotelia.example.Hotelia.repository.HotelRepository;
+import Hotelia.example.Hotelia.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,21 +13,23 @@ import java.util.Optional;
 @Service
 public class HotelService {
      private final HotelRepository hotelRepository;
+     private final UserRepository userRepository;
 
-    public HotelService(HotelRepository hotelRepository) {
+    public HotelService(HotelRepository hotelRepository, UserRepository userRepository) {
         this.hotelRepository = hotelRepository;
+        this.userRepository = userRepository;
     }
 
     //Add New Hotel
-    public Hotel addHotel(Hotel hotelRequest) throws HotelAlreadyExistException {
+    public Hotel addHotel(Hotel hotelRequest, Long adminId) throws HotelAlreadyExistException {
         if(hotelRepository.findByCode(hotelRequest.getCode()).isPresent()){
              throw new HotelAlreadyExistException("Hotel Already Exist");
         }
 
-        Hotel newHotel = new Hotel();
-        newHotel = hotelRepository.save(hotelRequest);
+        hotelRequest.setUser(userRepository.getById(adminId));
+        return hotelRepository.save(hotelRequest);
 
-        return newHotel;
+
     }
 
     //Get Hotel By HotelId
@@ -66,5 +70,9 @@ public class HotelService {
         existingHotel.setImagePath(updatedHotel.getImagePath());
 
         return hotelRepository.save(existingHotel);
+    }
+
+    public List<Hotel> getHotelByAdminId(Long adminId){
+        return hotelRepository.findByUserId(adminId);
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,16 +37,22 @@ public class RoomService {
         return newRoom;
     }
 
+    public Optional<Room> findByRoomId(Long roomId) {
+        return roomRepository.findById(roomId);
+    }
+
     public void deleteRoom(Long roomId){
         roomRepository.deleteById(roomId);
     }
 
-    public List<Room> findRoomsAvailableForBooking(Date checkIn, Date checkOut){
-        List<Long> bookedRoomIds = bookRepository.findBookedRoomIds(checkIn, checkOut) ;
-        List<Room> allRooms = roomRepository.findAll();
+    public List<Room> findRoomsAvailableForBooking(Long hotelId, Date checkIn, Date checkOut){
 
-        return allRooms.stream()
-                .filter(room -> !bookedRoomIds.contains(room.getId()) && "available".equalsIgnoreCase(room.getStatus()))
+        List<Long> bookedRoomIds = bookRepository.findBookedRoomIds(checkIn, checkOut);
+
+
+        return roomRepository.findByHotelId(hotelId).stream()
+                .filter(room -> !bookedRoomIds.contains(room.getId())
+                        && (room.getStatus() == null || "Available".equalsIgnoreCase(room.getStatus())))
                 .collect(Collectors.toList());
     }
 

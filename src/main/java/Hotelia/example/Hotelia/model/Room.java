@@ -1,5 +1,6 @@
 package Hotelia.example.Hotelia.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
@@ -17,12 +18,16 @@ public class Room {
     private Integer price;
     private String status;
     private Integer roomNo;
+
     @ManyToOne
     @JoinColumn(name = "hotelId")
     @JsonIgnore
     private Hotel hotel;
-    @OneToMany(mappedBy = "room")
+    @OneToMany(mappedBy = "room" )
+    //@JsonBackReference
+    @JsonIgnore
     private List<Book> books;
+
 
     public List<Book> getBooks() {
         return books;

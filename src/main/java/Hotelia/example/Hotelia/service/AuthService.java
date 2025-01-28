@@ -3,12 +3,14 @@ package Hotelia.example.Hotelia.service;
 import Hotelia.example.Hotelia.model.AuthResponse;
 import Hotelia.example.Hotelia.model.User;
 import Hotelia.example.Hotelia.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 
 
 @Service
@@ -31,7 +33,7 @@ public class AuthService {
     public AuthResponse register(User userRequest){
         if(userRepository.findByEmail(userRequest.getEmail()).isPresent()){
             return new AuthResponse(
-                    null);
+                    null, null);
         }
 
         User user = new User();
@@ -44,26 +46,25 @@ public class AuthService {
         user = userRepository.save(user);
 
         String token = jwtService.generateToken(user);
+        Long userId = user.getId();
 
-        return new AuthResponse(token);
+        return new AuthResponse(token,userId);
     }
 
 
-    public AuthResponse login(User userRequst){
+    public AuthResponse login(User userRequest){
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        userRequst.getEmail(),
-                        userRequst.getPassword()
+                        userRequest.getEmail(),
+                        userRequest.getPassword()
                 )
         );
 
-        User user = userRepository.findByEmail(userRequst.getEmail()).orElseThrow();
+        User user = userRepository.findByEmail(userRequest.getEmail()).orElseThrow();
         String token = jwtService.generateToken(user);
 
-        return new AuthResponse(token);
+        return new AuthResponse(token, user.getId());
     }
-
-
 
 
     public User getUserProfile(String token) {
@@ -80,6 +81,34 @@ public class AuthService {
 
         return userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new UsernameNotFoundException("User with email " + userEmail + " not found"));
+    }
+
+    @Transactional
+    public User updateUser(Long userId, User userRequest) {
+
+        Optional<User> isExist = userRepository.findById(userId);
+
+        if (isExist.isPresent()) {
+            User existingUser = isExist.get();
+
+            if (userRequest.getName() != null && !userRequest.getName().isEmpty()) {
+                existingUser.setName(userRequest.getName());
+            }
+            if (userRequest.getPhone() != null && !userRequest.getPhone().isEmpty()) {
+                existingUser.setPhone(userRequest.getPhone());
+            }
+            if (userRequest.getPassword() != null && !userRequest.getPassword().isEmpty()) {
+                existingUser.setPassword(passwordEncoder.encode(userRequest.getPassword()));
+            }
+
+            return userRepository.save(existingUser);
+        } else {
+            throw new RuntimeException("User not found with id: " + userId);
+        }
+    }
+
+    public void deleteUser(Long userId){
+        userRepository.deleteById(userId);
     }
 
 }

@@ -29,4 +29,6 @@ public interface HotelRepository extends JpaRepository<Hotel, Long> {
 
     void deleteById(Long id);
 
+    List<Hotel> findByUserId(Long userId);
+
 }

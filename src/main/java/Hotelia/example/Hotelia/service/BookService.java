@@ -1,5 +1,6 @@
 package Hotelia.example.Hotelia.service;
 
+import Hotelia.example.Hotelia.exception.NoBookingsFoundException;
 import Hotelia.example.Hotelia.model.Book;
 import Hotelia.example.Hotelia.model.Room;
 import Hotelia.example.Hotelia.model.User;
@@ -23,7 +24,7 @@ public class BookService {
         this.userRepository = userRepository;
     }
 
-    public Book addBooking(Long userId, Long roomId, Book bookRequest){
+    public Book addBooking(Long userId, Long hotelId, Long roomId, Book bookRequest){
 
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(()->new RuntimeException("Room with ID " + roomId + "not found"));
@@ -34,7 +35,7 @@ public class BookService {
 
             room.setStatus("Booked");
             roomRepository.save(room);
-
+            bookRequest.setHotelId(hotelId);
             bookRequest.setRoom(room);
             bookRequest.setUser(user);
         }
@@ -46,5 +47,16 @@ public class BookService {
 
     }
 
+    public List<Book> getBookByUserId(Long userId){
+        return bookRepository.findByUserId(userId);
+    }
+
+    public List<Book> getBookByHotelId(Long hotelId){
+        return bookRepository.findByHotelId(hotelId);
+    }
+
+    public void deleteBooking (Long bookingId){
+        bookRepository.deleteById(bookingId);
+    }
 
 }

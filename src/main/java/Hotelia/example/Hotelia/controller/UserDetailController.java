@@ -2,13 +2,10 @@ package Hotelia.example.Hotelia.controller;
 
 import Hotelia.example.Hotelia.model.User;
 import Hotelia.example.Hotelia.service.AuthService;
-import Hotelia.example.Hotelia.service.UserDetailsServiceImp;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/user")
@@ -42,6 +39,16 @@ public class UserDetailController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired token.");
         }
+    }
+
+    @PutMapping("/{userId}")
+    public User updateUser(@PathVariable Long userId, User userRequest){
+        return authService.updateUser(userId, userRequest);
+    }
+
+    @DeleteMapping("/{userId}")
+    public void deleteUser(@PathVariable Long userId){
+        authService.deleteUser(userId);
     }
 
 }
